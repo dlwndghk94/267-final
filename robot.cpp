@@ -142,8 +142,11 @@ float Robot::measurement_prob(float *measurements) {
 	float error_bearing;
 	int num_measurements = 4;
 	for (int i = 0; i < num_measurements; i++) {
+		// printf("measurements: %f\n",measurements[i]);
+		// printf("predicted_measurements: %f\n",predicted_measurements[i]);
 		error_bearing = fabs(measurements[i] - predicted_measurements[i]);
 		error_bearing = fmod((error_bearing + M_PI), (2.0*M_PI)) - M_PI;
+		printf("%i: %f\n",i,error_bearing);
 
 		// update Gaussian
 		error *= exp(-(error_bearing*error_bearing) / (bearing_noise * bearing_noise) / 2.0) / 
@@ -166,7 +169,7 @@ int main(){
 	printf("x = %f \n y = %f \n orientation = %f\n length = %f\n bearing_noise = %f\n steering_noise = %f\n distance_noise=%f\n", p.x, p.y, p.orientation, p.length, p.bearing_noise, p.steering_noise, p.distance_noise);
 
 	p.set(20, 20, 0);
-	p.set_noise(0.001, 0, 1);
+	p.set_noise(1, 1, 1);
 	printf("\nsetting...\n");
 	printf("x = %f \n y = %f \n orientation = %f\n length = %f\n bearing_noise = %f\n steering_noise = %f\n distance_noise=%f\n", p.x, p.y, p.orientation, p.length, p.bearing_noise, p.steering_noise, p.distance_noise);
 
@@ -176,7 +179,7 @@ int main(){
 	printf("x = %f \n y = %f \n orientation = %f\n length = %f\n bearing_noise = %f\n steering_noise = %f\n distance_noise=%f\n", p.x, p.y, p.orientation, p.length, p.bearing_noise, p.steering_noise, p.distance_noise);
 
 	float measurements[4];
-	p.sense(measurements, 0);
+	p.sense(measurements, 1);
 	printf("\nsensing...\n");
 	printf("z1 = %f\n z2 = %f\n z3 = %f\n z4 = %f\n\n", measurements[0], measurements[1], measurements[2], measurements[3]);
 
