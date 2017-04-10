@@ -8,7 +8,6 @@ Input CSV formatting:
 Each row is a step:
  - First two value in a row represent the x and y coordinates of the robot.
  - Each two values thereafter represent the x and y coordinates of the particle.
-
 """
 
 if __name__ == '__main__':
