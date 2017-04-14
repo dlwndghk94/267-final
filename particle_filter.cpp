@@ -5,6 +5,9 @@
 #include <cmath>
 #include <string.h>
 #include "robot.cpp"
+#include <time.h>
+#include "omp.h"
+
 
 // float bearing_noise = 0.1;
 // float steering_noise = 0.1;
@@ -32,6 +35,7 @@ float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, 
 	// Motion update (prediction)
 	// Robot p2[N];
 
+	#pragma omp parallel for
 	for (int i = 0; i<N; i++){
 		p[i] = p[i].move(motion);
 	}
@@ -135,6 +139,7 @@ int main(){
 	float measurement[4];
 	float motion[2];
 
+	clock_t start = clock(), diff;
 	for (int i = 0; i < num_motions; i++) {
 		
 		motion[0] = 2.0 *M_PI / 10.0;
@@ -144,11 +149,14 @@ int main(){
 		car.sense(measurement, 1);
 		float *output = particle_filter(motion, measurement, num_particles, particles, fp);
 
-		for (int i = 0; i < 3; i++){
-    		printf("Output %i: %f\n", i,output[i]);
-   		}
+		// for (int i = 0; i < 3; i++){
+  //   		printf("Output %i: %f\n", i,output[i]);
+  //  		}
 		// float estimate = particle_filter(motion, &car, )
 	}
+	diff = clock() - start;
+	float msec  = diff * 1000 / CLOCKS_PER_SEC;
+	printf("Time taken %f milliseconds\n", msec);
 	fclose(fp);
 
     // float *output = particle_filter(motions,8,measurements,50000,20);
