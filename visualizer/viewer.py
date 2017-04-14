@@ -2,16 +2,17 @@
 
 import matplotlib.pyplot as pyplot
 from math import sin, cos, degrees, pi
+import pdb
 
 class ParticleViewer:
 
-	def __init__(self):
+	def __init__(self, x_bound, y_bound):
 		self.figure = pyplot.figure()
 		self.axes = self.figure.gca()
 		pyplot.xlabel("X")
 		pyplot.ylabel("Y")
-		self.xbounds = [0,1]
-		self.ybounds = [0,1]
+		self.xbounds = [-x_bound, x_bound]
+		self.ybounds = [-y_bound,y_bound]
 
 	def clear(self):
 		self.axes.cla()
@@ -61,6 +62,7 @@ class ParticleViewer:
 		self.ybounds = list(y_tuple)
 
 	def show(self):
+		# pdb.set_trace()
 		self.axes.set_xlim(self.xbounds)
 		self.axes.set_ylim(self.ybounds)
 		self.axes.set_aspect('equal', adjustable='box')
