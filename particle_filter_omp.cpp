@@ -10,10 +10,6 @@
 #include "common.cpp"
 
 
-// float bearing_noise = 0.1;
-// float steering_noise = 0.1;
-// float distance_noise = 5.0;
-
 void get_position(Robot* p, int N, float* rtn){
 	float x = 0.0;
 	float y = 0.0;
@@ -29,13 +25,10 @@ void get_position(Robot* p, int N, float* rtn){
 	return;
 }
 
-// float *output = particle_filter(motion, measurement, num_particles, particles);
 
 float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, FILE* fp, bool output){
-	
-	// Motion update (prediction)
-	// Robot p2[N];
 
+	#pragma omp parallel for
 	for (int i = 0; i<N; i++){
 		p[i] = p[i].move(motion);
 	}
@@ -44,6 +37,7 @@ float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, 
 	float w[N];
 	float mw = -999999999.0;
 
+	#pragma omp parallel for reduction(max:mw)
 	for (int i = 0; i < N; i++){
 		w[i] = p[i].measurement_prob(measurement);
 		if (mw < w[i]){
@@ -53,9 +47,10 @@ float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, 
 
 	// Resampling
 	Robot p3[N];
-	int index = rand() % N;
-	float beta = 0.0;
+	#pragma omp parallel for
 	for (int i = 0; i < N; i++){
+		int index = rand() % N;
+		float beta = 0.0;
 		float rand_num = (double)rand() / (double)RAND_MAX;
 		beta = beta + rand_num * 2.0 * mw;
 
@@ -66,14 +61,15 @@ float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, 
 		p3[i] = p[index];
 	}
 
+	#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		p[i] = p3[i];
-		if (output) {
-			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
-		}	
 	}
 
-	if (output){
+	if (output) {
+		for (int i = 0; i < N; i++) { 
+			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
+		}
 		fprintf(fp,"\n");
 	}
 
@@ -89,18 +85,18 @@ int main(){
 	int num_particles = 5000;
 	float length = 20.0;
 	char* filename = "output.csv";
-	FILE* fp = fopen(filename, "a+"); 
+	FILE* fp = fopen(filename, "a+");
 
 	double simulation_time = read_timer();
 	// Initializing particles array
 	Robot particles[num_particles];
+	#pragma omp parallel for
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
 		r.set_noise(bearing_noise, steering_noise, distance_noise);
 		particles[i] = r;
 	}
-
 
 	Robot car;
 	car.initialize(length);
@@ -110,18 +106,19 @@ int main(){
 	float measurement[4];
 	float motion[2];
 
-	// clock_t start = clock(), diff;
 	for (int i = 0; i < num_motions; i++) {
 		
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
 		car = car.move(motion);
-		// comment back in
 		fprintf(fp,"%f, %f, ",car.x,car.y);
 		car.sense(measurement, 1);
 		float *output = particle_filter(motion, measurement, num_particles, particles, fp, false);
+
 	}
 	simulation_time = read_timer() - simulation_time;
+	// float msec  = diff * 1000 / CLOCKS_PER_SEC;
 	printf("Time taken %f seconds\n", simulation_time);
-	fclose(fp);
+	fclose(fp);    
+
 }
