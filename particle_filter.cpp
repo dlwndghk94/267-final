@@ -115,9 +115,10 @@ int main(){
 		motion[1] = 20.0;
 		car = car.move(motion);
 		// comment back in
-		fprintf(fp,"%f, %f, ",car.x,car.y);
+		//fprintf(fp,"%f, %f, ",car.x,car.y);
 		car.sense(measurement, 1);
 		float *output = particle_filter(motion, measurement, num_particles, particles, fp, false);
+
 	}
 	simulation_time = read_timer() - simulation_time;
 	printf("Time taken %f seconds\n", simulation_time);

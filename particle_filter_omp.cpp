@@ -25,57 +25,57 @@ void get_position(Robot* p, int N, float* rtn){
 }
 
 
-float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, FILE* fp, bool output){
+// float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, FILE* fp, bool output){
 
-	#pragma omp parallel for
-	for (int i = 0; i<N; i++){
-		p[i] = p[i].move(motion);
-	}
+// 	#pragma omp parallel for
+// 	for (int i = 0; i<N; i++){
+// 		p[i] = p[i].move(motion);
+// 	}
 
-	// Measurement update
-	float w[N];
-	float mw = -999999999.0;
+// 	// Measurement update
+// 	float w[N];
+// 	float mw = -999999999.0;
 
-	#pragma omp parallel for reduction(max:mw)
-	for (int i = 0; i < N; i++){
-		w[i] = p[i].measurement_prob(measurement);
-		if (mw < w[i]){
-			mw = w[i];
-		}
-	}
+// 	#pragma omp parallel for reduction(max:mw)
+// 	for (int i = 0; i < N; i++){
+// 		w[i] = p[i].measurement_prob(measurement);
+// 		if (mw < w[i]){
+// 			mw = w[i];
+// 		}
+// 	}
 
-	// Resampling
-	Robot p3[N];
-	#pragma omp parallel for
-	for (int i = 0; i < N; i++){
-		int index = rand() % N;
-		float beta = 0.0;
-		float rand_num = (double)rand() / (double)RAND_MAX;
-		beta = beta + rand_num * 2.0 * mw;
+// 	// Resampling
+// 	Robot p3[N];
+// 	#pragma omp parallel for
+// 	for (int i = 0; i < N; i++){
+// 		int index = rand() % N;
+// 		float beta = 0.0;
+// 		float rand_num = (double)rand() / (double)RAND_MAX;
+// 		beta = beta + rand_num * 2.0 * mw;
 
-		while( beta > w[index]){
-			beta = beta - w[index];
-			index = (index +1) % N;
-		}
-		p3[i] = p[index];
-	}
+// 		while( beta > w[index]){
+// 			beta = beta - w[index];
+// 			index = (index +1) % N;
+// 		}
+// 		p3[i] = p[index];
+// 	}
 
-	#pragma omp parallel for
-	for (int i = 0; i < N; i++) {
-		p[i] = p3[i];
-	}
+// 	#pragma omp parallel for
+// 	for (int i = 0; i < N; i++) {
+// 		p[i] = p3[i];
+// 	}
 
-	if (output) {
-		for (int i = 0; i < N; i++) { 
-			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
-		}
-		fprintf(fp,"\n");
-	}
+// 	if (output) {
+// 		for (int i = 0; i < N; i++) { 
+// 			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
+// 		}
+// 		fprintf(fp,"\n");
+// 	}
 
-	float *rtn = (float *) malloc(3* sizeof(float));
-	get_position(p, N, rtn);
-	return rtn;
-}
+// 	float *rtn = (float *) malloc(3* sizeof(float));
+// 	get_position(p, N, rtn);
+// 	return rtn;
+// }
 
 
 int main(){
@@ -88,13 +88,13 @@ int main(){
 
 	double simulation_time = read_timer();
 	// Initializing particles array
-	Robot particles[num_particles];
+	Robot p[num_particles];
 	#pragma omp parallel for
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
 		r.set_noise(bearing_noise, steering_noise, distance_noise);
-		particles[i] = r;
+		p[i] = r;
 	}
 
 	Robot car;
@@ -102,19 +102,93 @@ int main(){
 	car.set(20.0, 20.0, 0);
 	car.set_noise(bearing_noise, steering_noise, distance_noise);
 
+
 	float measurement[4];
 	float motion[2];
+	int N = num_particles;
+	Robot p3[N];
+	float w[N];
+	float mw;
 
-	for (int i = 0; i < num_motions; i++) {
-		
-		motion[0] = 2.0 *M_PI / 10.0;
-		motion[1] = 20.0;
-		car = car.move(motion);
-		fprintf(fp,"%f, %f, ",car.x,car.y);
-		car.sense(measurement, 1);
-		float *output = particle_filter(motion, measurement, num_particles, particles, fp, false);
+	#pragma omp parallel 
+	{
+		for (int i = 0; i < num_motions; i++) {
+			
+			#pragma omp master 
+			{
+				motion[0] = 2.0 *M_PI / 10.0;
+				motion[1] = 20.0;
+				car = car.move(motion);
+				//fprintf(fp,"%f, %f, ",car.x,car.y);
+				car.sense(measurement, 1);
+				float mw = -999999999.0;
+			}
+			#pragma omp barrier
 
+			// -----------------------------------//
+			// 	  PARTICLE FILTER STARTS HERE 	  //
+			// -----------------------------------//
+
+			// move all particles
+			#pragma omp for
+			for (int i = 0; i<N; i++){
+				p[i] = p[i].move(motion);
+			}
+			#pragma omp barrier
+
+			// Measurement update
+			#pragma omp for reduction(max:mw)
+			for (int i = 0; i < N; i++){
+				w[i] = p[i].measurement_prob(measurement);
+				if (mw < w[i]){
+					mw = w[i];
+				}
+			}
+			#pragma omp barrier
+
+			// Resampling
+			#pragma omp for
+			for (int i = 0; i < N; i++){
+				int index = rand() % N;
+				float beta = 0.0;
+				float rand_num = (double)rand() / (double)RAND_MAX;
+				beta = beta + rand_num * 2.0 * mw;
+
+				while( beta > w[index]){
+					beta = beta - w[index];
+					index = (index +1) % N;
+				}
+				p3[i] = p[index];
+			}
+			#pragma omp barrier
+
+			#pragma omp for
+			for (int i = 0; i < N; i++) {
+				p[i] = p3[i];
+			}
+			#pragma omp barrier
+
+			// if (output) {
+			// 	for (int i = 0; i < N; i++) { 
+			// 		fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
+			// 	}
+			// 	fprintf(fp,"\n");
+			// }
+
+			// float *rtn = (float *) malloc(3* sizeof(float));
+			// get_position(p, N, output);
+			
+			// -----------------------------------//
+			// 	  PARTICLE FILTER ENDS HERE 	  //
+			// -----------------------------------//	
+
+			//float *output = particle_filter(motion, measurement, num_particles, particles, fp, false);
+
+		}
 	}
+
+
+
 	simulation_time = read_timer() - simulation_time;
 	// float msec  = diff * 1000 / CLOCKS_PER_SEC;
 	printf("Time taken %f seconds\n", simulation_time);
