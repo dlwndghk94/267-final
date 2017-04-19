@@ -5,9 +5,8 @@
 #include <cmath>
 #include <string.h>
 #include "robot.cpp"
-#include <time.h>
-#include "omp.h"
 #include "common.cpp"
+#include "omp.h"
 
 
 void get_position(Robot* p, int N, float* rtn){

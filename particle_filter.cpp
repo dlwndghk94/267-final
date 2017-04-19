@@ -5,8 +5,6 @@
 #include <cmath>
 #include <string.h>
 #include "robot.cpp"
-#include <time.h>
-#include "omp.h"
 #include "common.cpp"
 
 
