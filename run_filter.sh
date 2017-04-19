@@ -3,13 +3,13 @@
 echo "Running standard algorithm \n"
 rm output.csv
 rm *.out
-g++ particle_filter.cpp
+g++ particle_filter_timed.cpp
 ./a.out
 
 echo "Running omp algorithm"
 rm output.csv
 rm *.out
-export OMP_NUM_THREADS=6
+export OMP_NUM_THREADS=2
 g++ -fopenmp particle_filter_omp.cpp
 ./a.out
 

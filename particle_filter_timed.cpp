@@ -6,7 +6,7 @@
 #include <string.h>
 #include "robot.cpp"
 #include "common.cpp"
-#include "omp.h"
+// #include "omp.h"
 
 
 void get_position(Robot* p, int N, float* rtn){
@@ -89,7 +89,6 @@ int main(){
 	double simulation_time = read_timer();
 	// Initializing particles array
 	Robot p[num_particles];
-	#pragma omp parallel for
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
@@ -115,16 +114,13 @@ int main(){
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
-	#pragma omp parallel 
 	{
 		for (int t = 0; t < num_motions; t++) {
 			
-			#pragma omp master 
 			{
 				movement_time -= read_timer();
 			}
 
-			#pragma omp master
 			{
 				motion[0] = 2.0 *M_PI / 10.0;
 				motion[1] = 20.0;
@@ -133,49 +129,38 @@ int main(){
 				car.sense(measurement, 1);
 				float mw = -999999999.0;
 			}
-			#pragma omp barrier
 
 			// -----------------------------------//
 			// 	  PARTICLE FILTER STARTS HERE 	  //
 			// -----------------------------------//
 
 			// move all particles
-			#pragma omp for
 			for (int i = 0; i<N; i++){
 				p[i] = p[i].move(motion);
 			}
-			#pragma omp barrier
-
-			#pragma omp master 
 			{
 				movement_time += read_timer();
 			}
 
-			#pragma omp master 
 			{
 				measurement_time -= read_timer();
 			}
 			// Measurement update
-			#pragma omp for reduction(max:mw)
 			for (int i = 0; i < N; i++){
 				w[i] = p[i].measurement_prob(measurement);
 				if (mw < w[i]){
 					mw = w[i];
 				}
 			}
-			#pragma omp barrier
 
-			#pragma omp master 
 			{
 				measurement_time += read_timer();
 			}
 
-			#pragma omp master 
 			{
 				resampling_time -= read_timer();
 			}
 			// Resampling
-			#pragma omp for
 			for (int i = 0; i < N; i++){
 				int index = rand() % N;
 				float beta = 0.0;
@@ -188,26 +173,19 @@ int main(){
 				}
 				p3[i] = p[index];
 			}
-			#pragma omp barrier
-			#pragma omp master 
 			{
 				resampling_time += read_timer();
 			}
 
-
-			#pragma omp master 
 			{
 				reassignment_time -= read_timer();
 			}
-			#pragma omp for
+
 			for (int i = 0; i < N; i++) {
 				p[i] = p3[i];
 			}
-			#pragma omp barrier
-			#pragma omp master 
-			{
-				reassignment_time += read_timer();
-			}
+	
+			reassignment_time += read_timer();
 
 			// if (output) {
 			// 	for (int i = 0; i < N; i++) { 
