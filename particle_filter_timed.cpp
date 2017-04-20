@@ -83,7 +83,7 @@ int main(){
 	int num_motions = 1000;
 	int num_particles = 5000;
 	float length = 20.0;
-	char* filename = "output.csv";
+	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
 
 	double simulation_time = read_timer();
