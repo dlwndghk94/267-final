@@ -1,15 +1,15 @@
 #!/bin/bash
 
-echo "Running standard algorithm \n"
+echo "Running standard algorithm..."
 rm output.csv
 rm *.out
 g++ particle_filter_timed.cpp
 ./a.out
 
-echo "Running omp algorithm"
+echo "\nRunning omp algorithm..."
 rm output.csv
 rm *.out
-export OMP_NUM_THREADS=2
+export OMP_NUM_THREADS=4
 g++ -fopenmp particle_filter_omp.cpp
 ./a.out
 

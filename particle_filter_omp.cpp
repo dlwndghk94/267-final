@@ -79,9 +79,9 @@ void get_position(Robot* p, int N, float* rtn){
 
 
 int main(){
-
-	int num_motions = 1000;
-	int num_particles = 5000;
+	srand(1);
+	int num_motions = 1;
+	int num_particles = 100000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
@@ -229,6 +229,7 @@ int main(){
 	}
 	simulation_time = read_timer() - simulation_time;
 	// float msec  = diff * 1000 / CLOCKS_PER_SEC;
+	printf("num_motions = %i, num_particles = %i\n", num_motions, num_particles);
 	printf("Time taken %f seconds\n", simulation_time);
 	printf("Movement time: %f seconds\n", movement_time);
 	printf("Measurement time: %f seconds\n", measurement_time);
