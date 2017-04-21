@@ -143,7 +143,6 @@ int main(){
 			}
 		}
 		measurement_time += read_timer();
-		}
 
 		// Resampling
 		resampling_time -= read_timer();
@@ -160,7 +159,6 @@ int main(){
 			p3[i] = p[index];
 		}
 		resampling_time += read_timer();
-		}
 
 		//reassignment_time
 		reassignment_time -= read_timer();
