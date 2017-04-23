@@ -80,8 +80,8 @@ void get_position(Robot* p, int N, float* rtn){
 
 int main(){
 	srand(1);
-	int num_motions = 1;
-	int num_particles = 100000;
+	int num_motions = 100;
+	int num_particles = 120000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
@@ -115,8 +115,8 @@ int main(){
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
-	#pragma omp parallel 
-	{
+	#pragma omp parallel shared(w,p) 
+	{	
 		for (int t = 0; t < num_motions; t++) {
 			
 			#pragma omp master 
@@ -181,11 +181,12 @@ int main(){
 				float beta = 0.0;
 				float rand_num = (double)rand() / (double)RAND_MAX;
 				beta = beta + rand_num * 2.0 * mw;
-
+				
 				while( beta > w[index]){
 					beta = beta - w[index];
 					index = (index +1) % N;
 				}
+				
 				p3[i] = p[index];
 			}
 			#pragma omp barrier

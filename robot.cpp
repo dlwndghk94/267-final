@@ -7,9 +7,12 @@
 
 
 float max_steering_angle = M_PI/4.0;
-float bearing_noise = 0.1; // Noise parameter: should be included in sense function.
+float bearing_noise = 1; // Noise parameter: should be included in sense function.
 float steering_noise = 0.1; // Noise parameter: should be included in move function.
 float distance_noise = 5.0; // Noise parameter: should be included in move function.
+//float bearing_noise = 0.1; // Noise parameter: should be included in sense function.
+//float steering_noise = 0.1; // Noise parameter: should be included in move function.
+//float distance_noise = 5.0; // Noise parameter: should be included in move function.
 
 float tolerance_xy = 15.0; // Tolerance for localization in the x and y directions.
 float tolerance_orientation = 0.25; // Tolerance for orientation.
