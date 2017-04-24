@@ -81,6 +81,7 @@ void get_position(Robot* p, int N, float* rtn){
 int main(){
 	int num_motions = 30;
 	int num_particles = 50000;
+
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
@@ -186,11 +187,12 @@ int main(){
 				float beta = 0.0;
 				float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
 				beta = beta + rand_num * 2.0 * mw;
-
-				while( beta > w[index] ){
+				
+				while( beta > w[index]){
 					beta = beta - w[index];
 					index = (index +1) % N;
 				}
+				
 				p3[i] = p[index];
 			}
 			#pragma omp barrier

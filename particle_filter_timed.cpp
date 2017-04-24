@@ -6,8 +6,6 @@
 #include <string.h>
 #include "robot.cpp"
 #include "common.cpp"
-// #include "omp.h"
-
 
 void get_position(Robot* p, int N, float* rtn){
 	float x = 0.0;
@@ -24,58 +22,6 @@ void get_position(Robot* p, int N, float* rtn){
 	return;
 }
 
-
-// float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, FILE* fp, bool output){
-
-// 	#pragma omp parallel for
-// 	for (int i = 0; i<N; i++){
-// 		p[i] = p[i].move(motion);
-// 	}
-
-// 	// Measurement update
-// 	float w[N];
-// 	float mw = -999999999.0;
-
-// 	#pragma omp parallel for reduction(max:mw)
-// 	for (int i = 0; i < N; i++){
-// 		w[i] = p[i].measurement_prob(measurement);
-// 		if (mw < w[i]){
-// 			mw = w[i];
-// 		}
-// 	}
-
-// 	// Resampling
-// 	Robot p3[N];
-// 	#pragma omp parallel for
-// 	for (int i = 0; i < N; i++){
-// 		int index = rand() % N;
-// 		float beta = 0.0;
-// 		float rand_num = (double)rand() / (double)RAND_MAX;
-// 		beta = beta + rand_num * 2.0 * mw;
-
-// 		while( beta > w[index]){
-// 			beta = beta - w[index];
-// 			index = (index +1) % N;
-// 		}
-// 		p3[i] = p[index];
-// 	}
-
-// 	#pragma omp parallel for
-// 	for (int i = 0; i < N; i++) {
-// 		p[i] = p3[i];
-// 	}
-
-// 	if (output) {
-// 		for (int i = 0; i < N; i++) { 
-// 			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
-// 		}
-// 		fprintf(fp,"\n");
-// 	}
-
-// 	float *rtn = (float *) malloc(3* sizeof(float));
-// 	get_position(p, N, rtn);
-// 	return rtn;
-// }
 
 
 int main(){
@@ -113,6 +59,7 @@ int main(){
 	float measurement_time = 0;
 	float resampling_time = 0;
 	float reassignment_time = 0;
+
 
 	for (int t = 0; t < num_motions; t++) {
 		
@@ -153,10 +100,12 @@ int main(){
 			float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
 			beta = beta + rand_num * 2.0 * mw;
 
+			
 			while( beta > w[index]){
 				beta = beta - w[index];
 				index = (index +1) % N;
 			}
+			
 			p3[i] = p[index];
 		}
 		resampling_time += read_timer();
