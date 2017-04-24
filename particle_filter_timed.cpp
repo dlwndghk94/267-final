@@ -80,7 +80,7 @@ void get_position(Robot* p, int N, float* rtn){
 
 int main(){
 	srand(1);
-	int num_motions = 1;
+	int num_motions = 30;
 	int num_particles = 100000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
@@ -147,9 +147,10 @@ int main(){
 		// Resampling
 		resampling_time -= read_timer();
 		for (int i = 0; i < N; i++){
-			int index = rand() % N;
+			unsigned int seed = 1;
+			int index = rand_r(&seed) % N;
 			float beta = 0.0;
-			float rand_num = (double)rand() / (double)RAND_MAX;
+			float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
 			beta = beta + rand_num * 2.0 * mw;
 
 			while( beta > w[index]){

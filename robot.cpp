@@ -7,7 +7,8 @@
 
 
 float max_steering_angle = M_PI/4.0;
-float bearing_noise = 0.1; // Noise parameter: should be included in sense function.
+// float bearing_noise = 0.1; // Noise parameter: should be included in sense function.
+float bearing_noise = 1.0;
 float steering_noise = 0.1; // Noise parameter: should be included in move function.
 float distance_noise = 5.0; // Noise parameter: should be included in move function.
 
@@ -27,8 +28,9 @@ double rand_normal(double mean, double stddev)
         double x, y, r;
         do
         {
-            x = 2.0*rand()/RAND_MAX - 1;
-            y = 2.0*rand()/RAND_MAX - 1;
+        	unsigned int seed = 1;
+            x = 2.0*rand_r(&seed)/RAND_MAX - 1;
+            y = 2.0*rand_r(&seed)/RAND_MAX - 1;
 
             r = x*x + y*y;
         }
@@ -63,9 +65,13 @@ class Robot {
 };
 
 void Robot::initialize (float length_) {
-	x = drand48() * world_size;
-	y = drand48() * world_size;
-	orientation = drand48() * 2.0 * M_PI;
+	unsigned int seed = 1;
+	// x = drand48() * world_size;
+	// y = drand48() * world_size;
+	// orientation = drand48() * 2.0 * M_PI;
+	x = rand_r(&seed) * world_size;
+	y = rand_r(&seed) * world_size;
+	orientation = rand_r(&seed) * 2.0 * M_PI;
 	length = length_;
 	bearing_noise = 0.0;
 	steering_noise = 0.0;
@@ -91,7 +97,12 @@ void Robot::set_noise (float b_noise, float s_noise, float d_noise) {
 Robot Robot::move(float *motion){
 	float L = length;
 	float theta = orientation;
-	float alpha = motion[0] + rand_normal(0.0, steering_noise);
+	// float alpha;
+
+	double mean = 0.0;
+	double stddev = steering_noise;
+
+	float alpha = motion[0] + rand_normal(0.0, 0.1);
 	float d = motion[1] + rand_normal(0.0, distance_noise);
 	float beta = (d/L) * tan(alpha);
 	if (fabs(beta) < 0.001){

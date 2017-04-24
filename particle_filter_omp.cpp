@@ -79,17 +79,17 @@ void get_position(Robot* p, int N, float* rtn){
 
 
 int main(){
-	srand(1);
-	int num_motions = 1;
-	int num_particles = 100000;
+	int num_motions = 30;
+	int num_particles = 50000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
 
 	double simulation_time = read_timer();
 	// Initializing particles array
-	Robot p[num_particles];
-	#pragma omp parallel for
+	Robot *p = (Robot *) malloc(num_particles * sizeof(Robot));
+	srand(1);
+	// #pragma omp parallel for
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
@@ -102,9 +102,7 @@ int main(){
 	car.set(20.0, 20.0, 0);
 	car.set_noise(bearing_noise, steering_noise, distance_noise);
 
-
 	float measurement[4];
-	float motion[2];
 	int N = num_particles;
 	Robot p3[N];
 	float w[N];
@@ -114,23 +112,27 @@ int main(){
 	float measurement_time = 0;
 	float resampling_time = 0;
 	float reassignment_time = 0;
-
-	#pragma omp parallel 
+	
+	// #pragma omp parallel shared(w, p) private(p3) num_threads(4)
+	#pragma omp parallel shared(w, p)
 	{
+		float motion[2];
+		motion[0] = 2.0 *M_PI / 10.0;
+		motion[1] = 20.0;
+		int tid = omp_get_thread_num();
+		printf("Thread id is %i\n", tid);
+		srand(tid);
 		for (int t = 0; t < num_motions; t++) {
 			
 			#pragma omp master 
 			{
 				movement_time -= read_timer();
 			}
-
+			car = car.move(motion);
+			//fprintf(fp,"%f, %f, ",car.x,car.y);
+			car.sense(measurement, 1);
 			#pragma omp master
 			{
-				motion[0] = 2.0 *M_PI / 10.0;
-				motion[1] = 20.0;
-				car = car.move(motion);
-				//fprintf(fp,"%f, %f, ",car.x,car.y);
-				car.sense(measurement, 1);
 				float mw = -999999999.0;
 			}
 			#pragma omp barrier
@@ -142,9 +144,11 @@ int main(){
 			// move all particles
 			#pragma omp for
 			for (int i = 0; i<N; i++){
-				p[i] = p[i].move(motion);
+				// p[i] = p[i].move(motion);
+				// float arr[2] = {0.1, 0.1};
+				p[i].move(motion);
 			}
-			#pragma omp barrier
+			// #pragma omp barrier
 
 			#pragma omp master 
 			{
@@ -177,12 +181,13 @@ int main(){
 			// Resampling
 			#pragma omp for
 			for (int i = 0; i < N; i++){
-				int index = rand() % N;
+				unsigned int seed = 2;
+				int index = rand_r(&seed) % N;
 				float beta = 0.0;
-				float rand_num = (double)rand() / (double)RAND_MAX;
+				float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
 				beta = beta + rand_num * 2.0 * mw;
 
-				while( beta > w[index]){
+				while( beta > w[index] ){
 					beta = beta - w[index];
 					index = (index +1) % N;
 				}
@@ -193,7 +198,6 @@ int main(){
 			{
 				resampling_time += read_timer();
 			}
-
 
 			#pragma omp master 
 			{
