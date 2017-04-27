@@ -80,7 +80,7 @@ void get_position(Robot* p, int N, float* rtn){
 
 int main(){
 	int num_motions = 30;
-	int num_particles = 50000;
+	int num_particles = 100000;
 
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
@@ -89,7 +89,7 @@ int main(){
 	double simulation_time = read_timer();
 	// Initializing particles array
 	Robot *p = (Robot *) malloc(num_particles * sizeof(Robot));
-	srand(1);
+	// srand(1);
 	// #pragma omp parallel for
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
@@ -103,39 +103,40 @@ int main(){
 	car.set(20.0, 20.0, 0);
 	car.set_noise(bearing_noise, steering_noise, distance_noise);
 
-	float measurement[4];
 	int N = num_particles;
 	Robot p3[N];
 	float w[N];
 	float mw;
+	float sum_lst[N];
 
 	float movement_time = 0;
 	float measurement_time = 0;
 	float resampling_time = 0;
 	float reassignment_time = 0;
 	
-	// #pragma omp parallel shared(w, p) private(p3) num_threads(4)
-	#pragma omp parallel shared(w, p)
+	#pragma omp parallel shared(car)
+	// #pragma omp parallel shared(w, p, sum_lst)
 	{
 		float motion[2];
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
-		int tid = omp_get_thread_num();
-		printf("Thread id is %i\n", tid);
-		srand(tid);
+		float measurement[4];
+		// int tid = omp_get_thread_num();
+		// srand(tid);
 		for (int t = 0; t < num_motions; t++) {
 			
 			#pragma omp master 
 			{
 				movement_time -= read_timer();
+				car = car.move(motion);
+				car.sense(measurement, 1);
 			}
-			car = car.move(motion);
+			
 			//fprintf(fp,"%f, %f, ",car.x,car.y);
-			car.sense(measurement, 1);
-			#pragma omp master
-			{
-				float mw = -999999999.0;
-			}
+			// #pragma omp master
+			// {
+			// 	float mw = -999999999.0;
+			// }
 			#pragma omp barrier
 
 			// -----------------------------------//
@@ -161,12 +162,12 @@ int main(){
 				measurement_time -= read_timer();
 			}
 			// Measurement update
-			#pragma omp for reduction(max:mw)
+			#pragma omp for
 			for (int i = 0; i < N; i++){
 				w[i] = p[i].measurement_prob(measurement);
-				if (mw < w[i]){
-					mw = w[i];
-				}
+				// if (mw < w[i]){
+				// 	mw = w[i];
+				// }
 			}
 			#pragma omp barrier
 
@@ -195,6 +196,29 @@ int main(){
 				
 			// 	p3[i] = p[index];
 			// }
+
+			#pragma omp master
+			{
+				sum_lst[0] = w[0];
+				for (int i = 1; i < N; i++){
+					sum_lst[i] = sum_lst[i-1] + w[i];
+				}
+			}
+
+			// Can parallelize this
+			#pragma omp parallel
+			for (int i = 0; i < N-1; i++)
+			{
+				sum_lst[i] = sum_lst[i]/sum_lst[N-1];
+			}
+
+			#pragma omp single
+			{
+				sum_lst[N-1] = 1;
+			}
+
+			#pragma omp barrier
+
 			#pragma omp for
 			for(int i =0; i < N; i++){
 				unsigned int seed = 1;
