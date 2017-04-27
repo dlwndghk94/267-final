@@ -60,9 +60,9 @@ int main(){
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
-	printf("Starting\n");
+	// printf("Starting\n");
 	for (int t = 0; t < num_motions; t++) {
-		printf("Moving\n");
+		// printf("Moving\n");
 		
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
@@ -81,7 +81,7 @@ int main(){
 			p[i] = p[i].move(motion);
 		}
 		movement_time += read_timer();
-		printf("Measureing\n");
+		// printf("Measuring\n");
 
 		// Measurement update
 		measurement_time -= read_timer();
@@ -97,7 +97,7 @@ int main(){
 		resampling_time -= read_timer();
 
 		// bin search number higher.
-		printf("binsearch:\n");
+		// printf("binsearch:\n");
 		float sum_lst[N];
 		sum_lst[0] = w[0];
 		for (int i = 1; i < N; i++){
@@ -113,7 +113,7 @@ int main(){
 			int index = N/2;
 			int step_size = N/2;
 			while (1){
-				printf("index: %i\n", index);
+				// printf("index: %i\n", index);
 				if (step_size >1){
 					step_size = step_size /2;
 				}
