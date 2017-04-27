@@ -180,19 +180,48 @@ int main(){
 				resampling_time -= read_timer();
 			}
 			// Resampling
+			// #pragma omp for
+			// for (int i = 0; i < N; i++){
+			// 	unsigned int seed = 2;
+			// 	int index = rand_r(&seed) % N;
+			// 	float beta = 0.0;
+			// 	float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
+			// 	beta = beta + rand_num * 2.0 * mw;
+				
+			// 	while( beta > w[index]){
+			// 		beta = beta - w[index];
+			// 		index = (index +1) % N;
+			// 	}
+				
+			// 	p3[i] = p[index];
+			// }
 			#pragma omp for
-			for (int i = 0; i < N; i++){
-				unsigned int seed = 2;
-				int index = rand_r(&seed) % N;
-				float beta = 0.0;
+			for(int i =0; i < N; i++){
+				unsigned int seed = 1;
 				float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
-				beta = beta + rand_num * 2.0 * mw;
-				
-				while( beta > w[index]){
-					beta = beta - w[index];
-					index = (index +1) % N;
+				int index = N/2;
+				int step_size = N/2;
+				while (1){
+					// printf("index: %i\n", index);
+					if (step_size >1){
+						step_size = step_size /2;
+					}
+					if (index == 0){
+						break;
+					}
+
+					else if (sum_lst[index -1] <= rand_num && sum_lst[index] > rand_num){
+						break;
+
+					}
+
+					else if (sum_lst[index] > rand_num){
+						index = index - step_size;
+					}
+					else if (sum_lst[index] < rand_num){
+						index = index + step_size;
+					}
 				}
-				
 				p3[i] = p[index];
 			}
 			#pragma omp barrier
