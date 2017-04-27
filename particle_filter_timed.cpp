@@ -34,7 +34,8 @@ int main(){
 
 	double simulation_time = read_timer();
 	// Initializing particles array
-	Robot p[num_particles];
+	// Robot p[num_particles];
+	Robot *p= (Robot *) malloc(num_particles * sizeof(Robot));
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
@@ -55,23 +56,21 @@ int main(){
 	float w[N];
 	float mw;
 
+
 	float movement_time = 0;
 	float measurement_time = 0;
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
-	printf("Starting\n");
+	// printf("Starting\n");
 	for (int t = 0; t < num_motions; t++) {
-		printf("Moving\n");
-		
+
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
 		car = car.move(motion);
-		printf("moved\n");
 		//fprintf(fp,"%f, %f, ",car.x,car.y);
 		car.sense(measurement, 1);
 		float mw = -999999999.0;
-		printf("moving loop\n");
 
 		// -----------------------------------//
 		// 	  PARTICLE FILTER STARTS HERE 	  //
@@ -83,7 +82,7 @@ int main(){
 			p[i] = p[i].move(motion);
 		}
 		movement_time += read_timer();
-		printf("Measuring\n");
+		// printf("Measuring\n");
 
 		// Measurement update
 		measurement_time -= read_timer();
@@ -99,7 +98,7 @@ int main(){
 		resampling_time -= read_timer();
 
 		// bin search number higher.
-		printf("binsearch:\n");
+		// printf("binsearch:\n");
 		float sum_lst[N];
 		sum_lst[0] = w[0];
 		for (int i = 1; i < N; i++){
@@ -115,7 +114,7 @@ int main(){
 			int index = N/2;
 			int step_size = N/2;
 			while (1){
-				printf("index: %i\n", index);
+				// printf("index: %i\n", index);
 				if (step_size >1){
 					step_size = step_size /2;
 				}

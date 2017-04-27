@@ -29,9 +29,9 @@ double rand_normal(double mean, double stddev)
     if (!n2_cached)
     {
         double x, y, r;
+        unsigned int seed = 1;
         do
         {
-        	unsigned int seed = 1;
             x = 2.0*rand_r(&seed)/RAND_MAX - 1;
             y = 2.0*rand_r(&seed)/RAND_MAX - 1;
 
