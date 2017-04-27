@@ -67,9 +67,11 @@ int main(){
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
 		car = car.move(motion);
+		printf("moved\n");
 		//fprintf(fp,"%f, %f, ",car.x,car.y);
 		car.sense(measurement, 1);
 		float mw = -999999999.0;
+		printf("moving loop\n");
 
 		// -----------------------------------//
 		// 	  PARTICLE FILTER STARTS HERE 	  //
@@ -81,7 +83,7 @@ int main(){
 			p[i] = p[i].move(motion);
 		}
 		movement_time += read_timer();
-		printf("Measureing\n");
+		printf("Measuring\n");
 
 		// Measurement update
 		measurement_time -= read_timer();
