@@ -60,8 +60,9 @@ int main(){
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
-
+	printf("Starting\n");
 	for (int t = 0; t < num_motions; t++) {
+		printf("Moving\n");
 		
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
@@ -80,6 +81,7 @@ int main(){
 			p[i] = p[i].move(motion);
 		}
 		movement_time += read_timer();
+		printf("Measureing\n");
 
 		// Measurement update
 		measurement_time -= read_timer();
@@ -93,21 +95,63 @@ int main(){
 
 		// Resampling
 		resampling_time -= read_timer();
-		for (int i = 0; i < N; i++){
-			unsigned int seed = 1;
-			int index = rand_r(&seed) % N;
-			float beta = 0.0;
-			float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
-			beta = beta + rand_num * 2.0 * mw;
 
-			
-			while( beta > w[index]){
-				beta = beta - w[index];
-				index = (index +1) % N;
+		// bin search number higher.
+		printf("binsearch:\n");
+		float sum_lst[N];
+		sum_lst[0] = w[0];
+		for (int i = 1; i < N; i++){
+			sum_lst[i] = sum_lst[i-1] + w[i];
+		}
+		for (int i = 0; i < N; i++){
+			sum_lst[i] = sum_lst[i]/sum_lst[N-1];
+		}
+
+		for(int i =0; i < N; i++){
+			unsigned int seed = 1;
+			float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
+			int index = N/2;
+			int step_size = N/2;
+			while (1){
+				printf("index: %i\n", index);
+				if (step_size >1){
+					step_size = step_size /2;
+				}
+				if (index == 0){
+					break;
+				}
+
+				else if (sum_lst[index -1] <= rand_num && sum_lst[index] > rand_num){
+					break;
+
+				}
+
+				else if (sum_lst[index] > rand_num){
+					index = index - step_size;
+				}
+				else if (sum_lst[index] < rand_num){
+					index = index + step_size;
+				}
 			}
-			
 			p3[i] = p[index];
 		}
+
+		// for (int i = 0; i < N; i++){
+
+		// 	unsigned int seed = 1;
+		// 	int index = rand_r(&seed) % N;
+		// 	float beta = 0.0;
+		// 	float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
+		// 	beta = beta + rand_num * 2.0 * mw;
+
+			
+		// 	while( beta > w[index]){
+		// 		beta = beta - w[index];
+		// 		index = (index +1) % N;
+		// 	}
+			
+		// 	p3[i] = p[index];
+		// }
 		resampling_time += read_timer();
 
 		//reassignment_time
