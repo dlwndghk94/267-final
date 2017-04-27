@@ -1,0 +1,24 @@
+num_motions = 30, num_particles = 100000
+Time taken 1.245968 seconds
+Movement time: 0.342190 seconds
+Measurement time: 0.766787 seconds
+Resampling time: 0.126694 seconds
+Reassignment time: 0.007290 seconds
+num_motions = 30, num_particles = 100000
+Time taken 0.700413 seconds
+Movement time: 0.221734 seconds
+Measurement time: 0.394158 seconds
+Resampling time: 0.077885 seconds
+Reassignment time: 0.003808 seconds
+num_motions = 30, num_particles = 100000
+Time taken 0.411816 seconds
+Movement time: 0.148643 seconds
+Measurement time: 0.209026 seconds
+Resampling time: 0.049049 seconds
+Reassignment time: 0.002102 seconds
+num_motions = 30, num_particles = 100000
+Time taken 0.299967 seconds
+Movement time: 0.150100 seconds
+Measurement time: 0.108335 seconds
+Resampling time: 0.037370 seconds
+Reassignment time: 0.001148 seconds

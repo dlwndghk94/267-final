@@ -1,0 +1,22 @@
+/var/spool/slurmd/job4852050/slurm_script: line 8: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 8: export: `1': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 10: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 10: export: `2': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4852050/slurm_script: line 12: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 12: export: `4': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4852050/slurm_script: line 14: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 14: export: `8': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4852050/slurm_script: line 16: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 16: export: `16': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4852050/slurm_script: line 18: export: `=': not a valid identifier
+/var/spool/slurmd/job4852050/slurm_script: line 18: export: `24': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created

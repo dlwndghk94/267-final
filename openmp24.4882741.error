@@ -1,0 +1,23 @@
+/var/spool/slurmd/job4882741/slurm_script: line 8: export: `=': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 8: export: `1': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 10: export: `=': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 10: export: `2': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4882741/slurm_script: line 12: export: `=': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 12: export: `4': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4882741/slurm_script: line 14: export: `=': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 14: export: `8': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+/var/spool/slurmd/job4882741/slurm_script: line 16: export: `=': not a valid identifier
+/var/spool/slurmd/job4882741/slurm_script: line 16: export: `16': not a valid identifier
+srun: Job step creation temporarily disabled, retrying
+srun: Job step created
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+slurmstepd: error: *** STEP 4882741.4 ON nid00567 CANCELLED AT 2017-04-26T23:04:09 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 4882741 ON nid00567 CANCELLED AT 2017-04-26T23:04:09 DUE TO TIME LIMIT ***
+srun: got SIGCONT
+srun: forcing job termination

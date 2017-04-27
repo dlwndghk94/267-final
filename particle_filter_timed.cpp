@@ -26,7 +26,7 @@ void get_position(Robot* p, int N, float* rtn){
 
 int main(){
 	srand(1);
-	int num_motions = 30;
+	int num_motions = 10;
 	int num_particles = 100000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";

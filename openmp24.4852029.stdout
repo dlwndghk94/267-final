@@ -1,0 +1,6 @@
+num_motions = 20, num_particles = 100000
+Time taken 3.939598 seconds
+Movement time: 2.301883 seconds
+Measurement time: 0.025083 seconds
+Resampling time: 1.593957 seconds
+Reassignment time: 0.001172 seconds

@@ -1,0 +1,2 @@
+/var/spool/slurmd/job4852029/slurm_script: line 8: export: `=': not a valid identifier
+/var/spool/slurmd/job4852029/slurm_script: line 8: export: `24': not a valid identifier

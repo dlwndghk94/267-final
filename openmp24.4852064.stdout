@@ -1,0 +1,36 @@
+num_motions = 20, num_particles = 100000
+Time taken 1.953171 seconds
+Movement time: 0.426882 seconds
+Measurement time: 0.518041 seconds
+Resampling time: 0.995831 seconds
+Reassignment time: 0.007216 seconds
+num_motions = 20, num_particles = 100000
+Time taken 2.734717 seconds
+Movement time: 1.376616 seconds
+Measurement time: 0.271515 seconds
+Resampling time: 1.074967 seconds
+Reassignment time: 0.004470 seconds
+num_motions = 20, num_particles = 100000
+Time taken 3.698689 seconds
+Movement time: 1.814528 seconds
+Measurement time: 0.142452 seconds
+Resampling time: 1.730708 seconds
+Reassignment time: 0.002555 seconds
+num_motions = 20, num_particles = 100000
+Time taken 3.838916 seconds
+Movement time: 1.915088 seconds
+Measurement time: 0.074505 seconds
+Resampling time: 1.837903 seconds
+Reassignment time: 0.001469 seconds
+num_motions = 20, num_particles = 100000
+Time taken 3.688411 seconds
+Movement time: 2.040056 seconds
+Measurement time: 0.037485 seconds
+Resampling time: 1.592978 seconds
+Reassignment time: 0.003169 seconds
+num_motions = 20, num_particles = 100000
+Time taken 3.897328 seconds
+Movement time: 2.245578 seconds
+Measurement time: 0.024991 seconds
+Resampling time: 1.607871 seconds
+Reassignment time: 0.001164 seconds

@@ -1,0 +1,4 @@
+/var/spool/slurmd/job4852020/slurm_script: line 8: export: `=': not a valid identifier
+/var/spool/slurmd/job4852020/slurm_script: line 8: export: `24': not a valid identifier
+srun: fatal: Can not execute ./a
+/var/spool/slurmd/job4852020/slurm_script: line 9:  3753 Aborted                 srun -n 1 -c 24 ./a
