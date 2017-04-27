@@ -1,2 +1,7 @@
 /var/spool/slurmd/job4885661/slurm_script: line 8: export: `=': not a valid identifier
 /var/spool/slurmd/job4885661/slurm_script: line 8: export: `1': not a valid identifier
+slurmstepd: error: *** STEP 4885661.0 ON nid00294 CANCELLED AT 2017-04-27T12:46:30 DUE TO TIME LIMIT ***
+slurmstepd: error: *** JOB 4885661 ON nid00294 CANCELLED AT 2017-04-27T12:46:30 DUE TO TIME LIMIT ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: got SIGCONT
+srun: forcing job termination

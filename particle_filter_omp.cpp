@@ -24,60 +24,6 @@ void get_position(Robot* p, int N, float* rtn){
 	return;
 }
 
-
-// float *particle_filter(float motion[2], float measurement[4], int N, Robot * p, FILE* fp, bool output){
-
-// 	#pragma omp parallel for
-// 	for (int i = 0; i<N; i++){
-// 		p[i] = p[i].move(motion);
-// 	}
-
-// 	// Measurement update
-// 	float w[N];
-// 	float mw = -999999999.0;
-
-// 	#pragma omp parallel for reduction(max:mw)
-// 	for (int i = 0; i < N; i++){
-// 		w[i] = p[i].measurement_prob(measurement);
-// 		if (mw < w[i]){
-// 			mw = w[i];
-// 		}
-// 	}
-
-// 	// Resampling
-// 	Robot p3[N];
-// 	#pragma omp parallel for
-// 	for (int i = 0; i < N; i++){
-// 		int index = rand() % N;
-// 		float beta = 0.0;
-// 		float rand_num = (double)rand() / (double)RAND_MAX;
-// 		beta = beta + rand_num * 2.0 * mw;
-
-// 		while( beta > w[index]){
-// 			beta = beta - w[index];
-// 			index = (index +1) % N;
-// 		}
-// 		p3[i] = p[index];
-// 	}
-
-// 	#pragma omp parallel for
-// 	for (int i = 0; i < N; i++) {
-// 		p[i] = p3[i];
-// 	}
-
-// 	if (output) {
-// 		for (int i = 0; i < N; i++) { 
-// 			fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
-// 		}
-// 		fprintf(fp,"\n");
-// 	}
-
-// 	float *rtn = (float *) malloc(3* sizeof(float));
-// 	get_position(p, N, rtn);
-// 	return rtn;
-// }
-
-
 int main(){
 	int num_motions = 30;
 	int num_particles = 100000;
@@ -115,14 +61,11 @@ int main(){
 	float reassignment_time = 0;
 	
 	#pragma omp parallel shared(car)
-	// #pragma omp parallel shared(w, p, sum_lst)
 	{
 		float motion[2];
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
 		float measurement[4];
-		// int tid = omp_get_thread_num();
-		// srand(tid);
 		for (int t = 0; t < num_motions; t++) {
 			
 			#pragma omp master 
@@ -132,11 +75,6 @@ int main(){
 				car.sense(measurement, 1);
 			}
 			
-			//fprintf(fp,"%f, %f, ",car.x,car.y);
-			// #pragma omp master
-			// {
-			// 	float mw = -999999999.0;
-			// }
 			#pragma omp barrier
 
 			// -----------------------------------//
@@ -146,11 +84,9 @@ int main(){
 			// move all particles
 			#pragma omp for
 			for (int i = 0; i<N; i++){
-				// p[i] = p[i].move(motion);
-				// float arr[2] = {0.1, 0.1};
 				p[i].move(motion);
 			}
-			// #pragma omp barrier
+			#pragma omp barrier
 
 			#pragma omp master 
 			{
@@ -165,9 +101,6 @@ int main(){
 			#pragma omp for
 			for (int i = 0; i < N; i++){
 				w[i] = p[i].measurement_prob(measurement);
-				// if (mw < w[i]){
-				// 	mw = w[i];
-				// }
 			}
 			#pragma omp barrier
 
@@ -180,23 +113,6 @@ int main(){
 			{
 				resampling_time -= read_timer();
 			}
-			// Resampling
-			// #pragma omp for
-			// for (int i = 0; i < N; i++){
-			// 	unsigned int seed = 2;
-			// 	int index = rand_r(&seed) % N;
-			// 	float beta = 0.0;
-			// 	float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
-			// 	beta = beta + rand_num * 2.0 * mw;
-				
-			// 	while( beta > w[index]){
-			// 		beta = beta - w[index];
-			// 		index = (index +1) % N;
-			// 	}
-				
-			// 	p3[i] = p[index];
-			// }
-
 			#pragma omp master
 			{
 				sum_lst[0] = w[0];
@@ -221,12 +137,11 @@ int main(){
 
 			#pragma omp for
 			for(int i =0; i < N; i++){
-				unsigned int seed = 1;
-				float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
+				unsigned int seed = (unsigned int) i;
+				float rand_num = (double)rand_r(&i) / (double)RAND_MAX;
 				int index = N/2;
 				int step_size = N/2;
 				while (1){
-					// printf("index: %i\n", index);
 					if (step_size >1){
 						step_size = step_size /2;
 					}
@@ -244,6 +159,9 @@ int main(){
 					}
 					else if (sum_lst[index] < rand_num){
 						index = index + step_size;
+					}
+					else { // equality
+						break;
 					}
 				}
 				p3[i] = p[index];
@@ -268,13 +186,6 @@ int main(){
 				reassignment_time += read_timer();
 			}
 
-			// if (output) {
-			// 	for (int i = 0; i < N; i++) { 
-			// 		fprintf(fp,"%f, %f, ",p[i].x,p[i].y);
-			// 	}
-			// 	fprintf(fp,"\n");
-			// }
-
 			// float *rtn = (float *) malloc(3* sizeof(float));
 			// get_position(p, N, output);
 			
@@ -287,7 +198,6 @@ int main(){
 		}
 	}
 	simulation_time = read_timer() - simulation_time;
-	// float msec  = diff * 1000 / CLOCKS_PER_SEC;
 	printf("num_motions = %i, num_particles = %i\n", num_motions, num_particles);
 	printf("Time taken %f seconds\n", simulation_time);
 	printf("Movement time: %f seconds\n", movement_time);

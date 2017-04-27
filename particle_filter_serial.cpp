@@ -22,18 +22,18 @@ void get_position(Robot* p, int N, float* rtn){
 	return;
 }
 
-int main(int argc, char *argv[]){
+int main(){
 	srand(1);
-	int num_particles = atoi(argv[1]);
-	int num_motions= atoi(argv[2]);
-	printf("%i %i\n",num_particles, num_motions);
+	int num_motions = 5;
+	int num_particles = 100000;
 	float length = 20.0;
 	char* filename = (char*) "output.csv";
 	FILE* fp = fopen(filename, "a+");
 
 	double simulation_time = read_timer();
 	// Initializing particles array
-	Robot p[num_particles];
+	// Robot p[num_particles];
+	Robot *p= (Robot *) malloc(num_particles * sizeof(Robot));
 	for (int i = 0; i < num_particles; i++){
 		Robot r;
 		r.initialize(length);
@@ -60,11 +60,13 @@ int main(int argc, char *argv[]){
 	float resampling_time = 0;
 	float reassignment_time = 0;
 
+	// printf("Starting\n");
 	for (int t = 0; t < num_motions; t++) {
 
 		motion[0] = 2.0 *M_PI / 10.0;
 		motion[1] = 20.0;
 		car = car.move(motion);
+		//fprintf(fp,"%f, %f, ",car.x,car.y);
 		car.sense(measurement, 1);
 		float mw = -999999999.0;
 
@@ -78,6 +80,7 @@ int main(int argc, char *argv[]){
 			p[i] = p[i].move(motion);
 		}
 		movement_time += read_timer();
+		// printf("Measuring\n");
 
 		// Measurement update
 		measurement_time -= read_timer();
@@ -92,6 +95,8 @@ int main(int argc, char *argv[]){
 		// Resampling
 		resampling_time -= read_timer();
 
+		// bin search number higher.
+		// printf("binsearch:\n");
 		float sum_lst[N];
 		sum_lst[0] = w[0];
 		for (int i = 1; i < N; i++){
@@ -102,8 +107,15 @@ int main(int argc, char *argv[]){
 		}
 
 		for(int i =0; i < N; i++){
+			// if (i % 1000 == 0) {
+			// 	printf("Particle %i\n", i);
+			// }
+			// unsigned int seed = i;
+			// printf("RAND_MAX IS %i\n", RAND_MAX);
+			// float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
 			float rand_sample = (float) rand();
 			float rand_num = rand_sample / (float) RAND_MAX;
+			// printf("rand_num is %f\n", rand_num);
 			int index = N/2;
 			int step_size = N/2;
 			int count = 0;
@@ -113,12 +125,14 @@ int main(int argc, char *argv[]){
 			}
 
 			while (1){
+				// printf("Rand num is %d\n", rand_num);
 				count += 1;
 				if (count > N) {
 					printf("Error on rand_num %f, rand_sample %f, particle number %i, particle weight %d, index %i\n", rand_num, rand_sample, i, w[i], index);
 					printf("Max sum lst idx is %f", sum_lst[99999]);
 					printf("Current sum_list val is %f", sum_lst[index]);
 				}
+				// printf("index: %i\n", index);
 				if (step_size >1){
 					step_size = step_size /2;
 				}
@@ -143,6 +157,22 @@ int main(int argc, char *argv[]){
 			p3[i] = p[index];
 		}
 
+		// for (int i = 0; i < N; i++){
+
+		// 	unsigned int seed = 1;
+		// 	int index = rand_r(&seed) % N;
+		// 	float beta = 0.0;
+		// 	float rand_num = (double)rand_r(&seed) / (double)RAND_MAX;
+		// 	beta = beta + rand_num * 2.0 * mw;
+
+			
+		// 	while( beta > w[index]){
+		// 		beta = beta - w[index];
+		// 		index = (index +1) % N;
+		// 	}
+			
+		// 	p3[i] = p[index];
+		// }
 		resampling_time += read_timer();
 
 		//reassignment_time
